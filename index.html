@@ -58,6 +58,11 @@
   <!-- Toast Notification Engine (Zero Native alert()) -->
   <aside id="toastContainer" class="toast-container" aria-live="polite"></aside>
 
+  <!-- Center-Screen API Spinner -->
+  <div id="spinnerOverlay" class="spinner-overlay" role="status" aria-live="polite" aria-label="Processing">
+    <div class="spinner"></div>
+  </div>
+
   <!-- Pinned Top App Bar (48px Touch Targets) -->
   <header class="app-header">
     <button id="leftMenuBtn" class="header-btn" aria-label="Open Informational Menu">
@@ -192,7 +197,7 @@
           Export Encrypted JSON
         </button>
         <label class="utility-btn file-label">
-          <input type="file" id="importVaultInput" accept=".json">
+          <input type="file" id="importVaultInput" accept=".json,.txt">
           <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6m4 18H6V4h7v5h5v11Z"/></svg>
           Import Vault JSON
         </label>
@@ -247,6 +252,19 @@
 
         <label for="apiTestOutput" class="card-caption" style="margin-top:12px;">API Response Output:</label>
         <textarea id="apiTestOutput" rows="4" readonly placeholder="Structured JSON response will appear here..."></textarea>
+      </div>
+
+      <div class="api-doc-box">
+        <h3>Mode 1: postMessage (iframe)</h3>
+        <p>Embed the app, send a message, receive the reply. Actions: <code>encrypt</code>, <code>decrypt</code>, <code>ping</code>. A <code>key</code> is always required; your unlocked vault key is never used by the API.</p>
+        <pre id="apiDocPostExample" class="api-doc-code"></pre>
+
+        <h3>Mode 2: URL parameters (headless)</h3>
+        <p>Open the app with parameters. Use the <code>#fragment</code> (not <code>?query</code>) so secrets never reach a server. Parameters: <code>api</code>, <code>key</code>, <code>text</code> (encrypt), <code>payload</code> (decrypt, JSON or base64url JSON), optional <code>callback</code> (https only; the result returns in <code>#result=</code>). Without a callback the result opens here.</p>
+        <pre id="apiDocUrlExample" class="api-doc-code"></pre>
+
+        <h3>Mode 3: Live tester</h3>
+        <p>Use the console above to try both actions with a passphrase.</p>
       </div>
     </div>
   </div>
@@ -392,6 +410,23 @@
     </div>
   </div>
 
+  <!-- Import Confirmation -->
+  <div id="modalConfirm" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>Confirm Import</h2>
+    </header>
+    <div class="modal-body">
+      <div class="warning-banner">
+        <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4m-1 6h2v6h-2V7m0 8h2v2h-2v-2Z"/></svg>
+        <span>VAULT REPLACEMENT</span>
+      </div>
+      <p id="confirmMessage"></p>
+      <button id="confirmImportBtn" class="primary-btn">Replace Vault</button>
+      <button id="cancelImportBtn" class="secondary-btn">Cancel</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
+  <script src="bible.js"></script>
 </body>
 </html>
