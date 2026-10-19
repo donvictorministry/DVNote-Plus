@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DV-NOTE plus Asset Generator</title>
+  <style>
+    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; background: #090d16; color: #fff; text-align: center; }
+    button { padding: 18px 32px; font-size: 20px; font-weight: bold; background: #0284c7; color: #fff; border: none; border-radius: 12px; cursor: pointer; }
+    button:active { background: #0369a1; }
+  </style>
+</head>
+<body>
+  <h2>DV-NOTE plus: Icon &amp; WhatsApp OG Generator</h2>
+  <button id="downloadBtn">Download All Icons + WhatsApp OG Image</button>
+
+  <script>
+    function createIcon(size) {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, size, size);
+      grad.addColorStop(0, '#0284c7');
+      grad.addColorStop(1, '#0369a1');
+      ctx.fillStyle = grad;
+
+      const radius = size * 0.22;
+      ctx.beginPath();
+      ctx.moveTo(radius, 0);
+      ctx.lineTo(size - radius, 0);
+      ctx.quadraticCurveTo(size, 0, size, radius);
+      ctx.lineTo(size, size - radius);
+      ctx.quadraticCurveTo(size, size, size - radius, size);
+      ctx.lineTo(radius, size);
+      ctx.quadraticCurveTo(0, size, 0, size - radius);
+      ctx.lineTo(0, radius);
+      ctx.quadraticCurveTo(0, 0, radius, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Padlock Vector Representation
+      ctx.fillStyle = '#ffffff';
+      const pad = size * 0.25;
+      const w = size - pad * 2;
+      const h = size * 0.45;
+      const y = size * 0.42;
+
+      // Body
+      ctx.fillRect(pad, y, w, h);
+
+      // Shackle
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = Math.max(2, size * 0.08);
+      ctx.beginPath();
+      ctx.arc(size / 2, y, size * 0.18, Math.PI, 0, false);
+      ctx.stroke();
+
+      return canvas.toDataURL('image/png');
+    }
+
+    function createWhatsAppOG() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1200;
+      canvas.height = 630;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#090d16';
+      ctx.fillRect(0, 0, 1200, 630);
+
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(30, 30, 1140, 570);
+
+      const iconX = 120;
+      const iconY = 205;
+      const iconSize = 220;
+
+      const grad = ctx.createLinearGradient(iconX, iconY, iconX + iconSize, iconY + iconSize);
+      grad.addColorStop(0, '#0284c7');
+      grad.addColorStop(1, '#0369a1');
+      ctx.fillStyle = grad;
+
+      ctx.beginPath();
+      ctx.roundRect(iconX, iconY, iconSize, iconSize, 44);
+      ctx.fill();
+
+      // Lock Emblem inside OG
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(iconX + 55, iconY + 95, 110, 80);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.arc(iconX + 110, iconY + 95, 42, Math.PI, 0, false);
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 74px -apple-system, sans-serif';
+      ctx.fillText('DV-NOTE plus', 390, 290);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 36px -apple-system, sans-serif';
+      ctx.fillText('Sovereign Vault & Two-Way Cryptographic API', 390, 355);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '30px -apple-system, sans-serif';
+      ctx.fillText('AES-GCM 256-Bit • Zero Backend • Offline PWA', 390, 415);
+
+      return canvas.toDataURL('image/png');
+    }
+
+    function triggerDownload(dataUrl, filename) {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      triggerDownload(createIcon(16), 'icon16.png');
+      setTimeout(() => triggerDownload(createIcon(48), 'icon48.png'), 200);
+      setTimeout(() => triggerDownload(createIcon(128), 'icon128.png'), 400);
+      setTimeout(() => triggerDownload(createWhatsAppOG(), 'og-image.png'), 600);
+    });
+  </script>
+</body>
+</html>
