@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 1. PARSER CRITICAL DIRECTIVES -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+  <!-- 2. PRIMARY SEO METADATA -->
+  <title>DV-NOTE plus — Sovereign Encrypted Vault &amp; Cryptographic API</title>
+  <meta name="title" content="DV-NOTE plus — Sovereign Encrypted Vault &amp; Cryptographic API" />
+  <meta name="description" content="Android-first AES-GCM 256-bit encrypted note vault and two-way client-side cryptographic API. Zero backend, 100% offline-capable, and zero tracking." />
+  <meta name="keywords" content="encrypted notes, aes-256 vault, client-side encryption, crypto api, pwa, offline privacy, android-first" />
+  <meta name="author" content="Rev. Chris Johnson, PhD" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <link rel="canonical" href="https://yourusername.github.io/dv-note-plus/" />
+
+  <!-- 3. ANDROID & BROWSER THEME DIRECTIVES -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090d16" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="DV-NOTE plus" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <!-- 4. APPLE MOBILE WEB TAGS -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="DV-NOTE plus" />
+  <link rel="apple-touch-icon" href="icon128.png" />
+
+  <!-- 5. OPEN GRAPH (WHATSAPP, FACEBOOK, LINKEDIN) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:site_name" content="DV-NOTE plus" />
+  <meta property="og:title" content="DV-NOTE plus — Sovereign Encrypted Vault &amp; Cryptographic API" />
+  <meta property="og:description" content="Android-first AES-256 encrypted note vault with two-way API. Zero server dependencies, zero tracking." />
+  <meta property="og:url" content="https://yourusername.github.io/dv-note-plus/" />
+  <meta property="og:image" content="https://yourusername.github.io/dv-note-plus/og-image.png" />
+  <meta property="og:image:secure_url" content="https://yourusername.github.io/dv-note-plus/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="DV-NOTE plus Brand Emblem Banner" />
+
+  <!-- 6. TWITTER / X CARD METADATA -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="DV-NOTE plus — Sovereign Encrypted Vault" />
+  <meta name="twitter:description" content="AES-256 encrypted mobile vault and client-side cryptographic API." />
+  <meta name="twitter:image" content="https://yourusername.github.io/dv-note-plus/og-image.png" />
+
+  <!-- 7. PWA MANIFEST & RESOURCE LINKS -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icon16.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icon48.png" />
+  <link rel="icon" type="image/png" sizes="128x128" href="icon128.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="light">
+  <!-- Toast Notification Engine (Zero Native alert()) -->
+  <aside id="toastContainer" class="toast-container" aria-live="polite"></aside>
+
+  <!-- Pinned Top App Bar (48px Touch Targets) -->
+  <header class="app-header">
+    <button id="leftMenuBtn" class="header-btn" aria-label="Open Informational Menu">
+      <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </button>
+
+    <div class="brand">
+      <svg class="ui-icon brand-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2m-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2m3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2Z"/></svg>
+      <span class="brand-title">DV-NOTE plus</span>
+    </div>
+
+    <button id="rightMenuBtn" class="header-btn" aria-label="Open Settings and Utilities">
+      <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2Z"/></svg>
+    </button>
+  </header>
+
+  <!-- Android Edge-to-Edge Viewport -->
+  <main class="android-viewport">
+    
+    <!-- Vault Master Key Lock/Unlock Status -->
+    <section class="mobile-card vault-status-card">
+      <div class="vault-status-header">
+        <svg class="ui-icon" id="vaultStatusIcon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 17a2 2 0 0 0 2-2c0-1.11-.89-2-2-2a2 2 0 0 0-2 2c0 1.11.89 2 2 2m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5 5 5 0 0 1 5 5v2h1m-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3Z"/></svg>
+        <span id="vaultStatusText" class="vault-status-title">Vault Locked (AES-256)</span>
+      </div>
+      <div class="vault-key-input-row">
+        <input type="password" id="masterKeyInput" placeholder="Enter Master Passphrase..." autocomplete="off" />
+        <button id="unlockVaultBtn" class="primary-btn submit-key-btn">Unlock</button>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-input-wrapper">
+        <svg class="ui-icon-input" viewBox="0 0 24 24"><path fill="currentColor" d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <input type="text" id="searchInput" placeholder="Search decrypted records..." autocomplete="off" />
+        <button id="clearSearchBtn" class="clear-btn" aria-label="Clear Search">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Secure Capture Card -->
+    <section class="mobile-card" id="captureCard">
+      <label for="newNoteTitleInput" class="card-caption">Secure Note Title</label>
+      <input type="text" id="newNoteTitleInput" placeholder="Title / Theological Reference..." />
+      
+      <label for="newNoteBodyInput" class="card-caption" style="margin-top:6px;">Encrypted Content</label>
+      <textarea id="newNoteBodyInput" placeholder="Confidential sermon notes, study records, or research..." rows="4"></textarea>
+
+      <button id="saveNoteBtn" class="primary-btn">
+        <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4Z"/></svg>
+        <span>Encrypt &amp; Store Note</span>
+      </button>
+    </section>
+
+    <!-- Records Telemetry -->
+    <div class="list-telemetry">
+      <span id="vaultCountLabel">0 Encrypted Records</span>
+    </div>
+
+    <!-- Notes Stack -->
+    <section id="notesList" class="notes-stack" aria-live="polite"></section>
+
+    <footer class="mobile-footer">
+      <p>DV-NOTE plus • AES-256 Client-Side Sovereign Vault</p>
+    </footer>
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- LEFT SIDEBAR: PUBLIC INFORMATIONAL (7 MODALS)                  -->
+  <!-- ============================================================== -->
+  <aside id="leftSidebar" class="sidebar drawer-left" aria-hidden="true">
+    <div class="drawer-header">
+      <h2>Information Hub</h2>
+      <button class="close-btn" data-close="leftSidebar" aria-label="Close Left Sidebar">
+        <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+      </button>
+    </div>
+    <nav class="drawer-nav">
+      <button class="nav-link-btn" data-modal="modalAboutApp">About the App</button>
+      <button class="nav-link-btn" data-modal="modalAboutDev">About Developer</button>
+      <button class="nav-link-btn" data-modal="modalAboutTeam">About Team</button>
+      <button class="nav-link-btn" data-modal="modalProprietary">Proprietary Software Warning</button>
+      <button class="nav-link-btn" data-modal="modalHowToUse">How to Use</button>
+      <button class="nav-link-btn" data-modal="modalPartner">Partner With Us</button>
+      <button class="nav-link-btn" data-modal="modalContact">Contact Us</button>
+    </nav>
+  </aside>
+
+  <!-- ============================================================== -->
+  <!-- RIGHT SIDEBAR: UTILITIES, FONT SCALE & TWO-WAY API SUITE       -->
+  <!-- ============================================================== -->
+  <aside id="rightSidebar" class="sidebar drawer-right" aria-hidden="true">
+    <div class="drawer-header">
+      <h2>Settings &amp; Utilities</h2>
+      <button class="close-btn" data-close="rightSidebar" aria-label="Close Right Sidebar">
+        <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+      </button>
+    </div>
+    <div class="drawer-content">
+      <!-- Dark Theme Toggle -->
+      <div class="utility-row">
+        <span>Dark Theme</span>
+        <label class="switch">
+          <input type="checkbox" id="darkModeCheckbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <!-- Typography Scale Slider (Strictly 19px to 23px) -->
+      <div class="utility-row font-control">
+        <label for="fontSlider">Typographical Floor: <strong id="fontSizeIndicator">19px</strong></label>
+        <input type="range" id="fontSlider" min="19" max="23" value="19" step="1">
+      </div>
+
+      <!-- Two-Way Cryptographic API Engine Panel -->
+      <div class="api-bridge-card">
+        <h3>Two-Way Cryptographic API</h3>
+        <p>This app acts as an active cryptographic micro-service via <code>postMessage</code> or URL Parameters.</p>
+        <button id="openApiTesterBtn" class="utility-btn">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="m14 12-4-4v3H2v2h8v3m12-7v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2h2v2h14V5H6v2H4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+          API Console &amp; Docs
+        </button>
+      </div>
+
+      <!-- Backup & Restore -->
+      <div class="sync-section">
+        <h3>Encrypted Export / Import</h3>
+        <button id="exportVaultBtn" class="utility-btn">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M5 20h14v-2H5v2m7-18L5.33 9h4.67v6h4V9h4.67L12 2Z"/></svg>
+          Export Encrypted JSON
+        </button>
+        <label class="utility-btn file-label">
+          <input type="file" id="importVaultInput" accept=".json">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6m4 18H6V4h7v5h5v11Z"/></svg>
+          Import Vault JSON
+        </label>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="actions-stack">
+        <button id="installAppBtn" class="utility-btn">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M5 20h14v-2H5v2m7-18L5.33 9h4.67v6h4V9h4.67L12 2Z"/></svg>
+          Install on Android
+        </button>
+        <button id="shareAppBtn" class="utility-btn">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92Z"/></svg>
+          Share Direct URL
+        </button>
+        <button id="bluetoothShareBtn" class="utility-btn bluetooth">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="m14.88 16.29 2.83-2.83-4.24-4.24V2h-1v7.59L8.71 5.83l-.71.71L12.41 11l-4.41 4.46.71.71 3.76-3.76V20h1v-7.59l3.53 3.53.88-.35M13.41 4.41l2.12 2.12-2.12 2.12V4.41m0 13.18v-4.24l2.12 2.12-2.12 2.12Z"/></svg>
+          Transmit via Bluetooth
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+
+  <!-- ============================================================== -->
+  <!-- TWO-WAY API TESTER & DOCUMENTATION MODAL (100dvh x 100dvw)     -->
+  <!-- ============================================================== -->
+  <div id="apiModal" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>Two-Way API Engine</h2>
+      <button id="closeApiModalBtn" class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body">
+      <div class="warning-banner" style="border-color:var(--primary); background:rgba(2,132,199,0.12); color:var(--primary);">
+        <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2m1 15h-2v-6h2m0-4h-2V5h2Z"/></svg>
+        <span>Zero-Backend Client-Side API</span>
+      </div>
+      <p>External websites and applications can call this app as a cryptographic microservice using <code>window.postMessage</code> or URL Query Parameters.</p>
+      
+      <div class="api-console-box">
+        <label for="apiTestPayload" class="card-caption">Test Input Payload (Plaintext):</label>
+        <textarea id="apiTestPayload" placeholder="Text to process through API..." rows="3">Confidential Research Transcript</textarea>
+        
+        <label for="apiTestPass" class="card-caption" style="margin-top:8px;">Passphrase Key:</label>
+        <input type="text" id="apiTestPass" value="Proverb2026" />
+
+        <div style="display:flex; gap:8px; margin-top:12px;">
+          <button id="callApiEncryptBtn" class="primary-btn">Call API (Encrypt)</button>
+          <button id="callApiDecryptBtn" class="secondary-btn">Call API (Decrypt)</button>
+        </div>
+
+        <label for="apiTestOutput" class="card-caption" style="margin-top:12px;">API Response Output:</label>
+        <textarea id="apiTestOutput" rows="4" readonly placeholder="Structured JSON response will appear here..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 7 FULLSCREEN MODALS (100% dvh x 100% dvw Edge-To-Edge)         -->
+  <!-- ============================================================== -->
+
+  <!-- 1. Modal: About App -->
+  <div id="modalAboutApp" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>About DV-NOTE plus</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body">
+      <p><strong>DV-NOTE plus</strong> is an Android-exclusive, edge-to-edge confidential note vault and bidirectional cryptographic client-side API engine.</p>
+      <p>It utilizes the browser's native Web Crypto API (AES-GCM 256-bit with PBKDF2 SHA-256 derivation) to guarantee client-side zero-knowledge security. No unencrypted text is ever stored, transmitted, or logged. All operations run 100% offline via Service Worker.</p>
+    </div>
+  </div>
+
+  <!-- 2. Modal: About Developer -->
+  <div id="modalAboutDev" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>About Developer</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body dev-profile">
+      <!-- Circular Photo Placeholder -->
+      <img 
+        src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" 
+        alt="Developer Photo" 
+        id="devPhotoPlaceholder" 
+        class="circle-dev-img" 
+      />
+      <h3 class="dev-name">Rev. Chris Johnson, PhD</h3>
+      <h4 class="dev-role">Principal Systems Architect &amp; Academic Dean</h4>
+
+      <div id="devBioText" class="clamped-bio">
+        Rev. Chris Johnson, PhD, is an academic researcher, theological educator, and software architect dedicated to developing accessible, dignified, and client-sovereign digital systems. With decades of executive leadership in education and technological design, Dr. Johnson establishes uncompromising standards for user interface ergonomics, typography legibility, and offline privacy. This software reflects strict build standards, ensuring readable typography, edge-to-edge responsiveness, zero unnecessary tracking, and uncompromising runtime stability. Every component was handcrafted to balance technical minimalism with rich sensory design.
+      </div>
+      <button id="toggleBioBtn" class="text-expand-btn">Show More</button>
+    </div>
+  </div>
+
+  <!-- 3. Modal: About Team -->
+  <div id="modalAboutTeam" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>About Our Team</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body team-stack">
+      <div class="team-card">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80" alt="Sarah Chen" class="team-photo" />
+        <h3 class="team-name">Sarah Chen</h3>
+        <p class="team-role">Head of Cryptographic Systems</p>
+        <p class="team-bio">Specializing in zero-knowledge client encryption architectures and sovereign key derivation.</p>
+      </div>
+      <div class="team-card">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80" alt="Marcus Gray" class="team-photo" />
+        <h3 class="team-name">Marcus Gray</h3>
+        <p class="team-role">Lead Integration Engineer</p>
+        <p class="team-bio">Architecting postMessage protocols, bidirectional Web Worker APIs, and offline PWA reliability.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Modal: Proprietary Notice -->
+  <div id="modalProprietary" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>Proprietary Notice</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body legal-text">
+      <div class="warning-banner">
+        <svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4m-1 6h2v6h-2V7m0 8h2v2h-2v-2Z"/></svg>
+        <span>STRICT PROPRIETARY NOTICE</span>
+      </div>
+      <p>All source code, asset formulations, bidirectional API protocols, and UI layouts are strictly proprietary property.</p>
+      <p>Unauthorized copying, decompilation, redistribution, commercial reselling, or reverse engineering of this software in whole or in part without prior explicit written authorization is unlawful and strictly prohibited.</p>
+      <p>© DV-NOTE plus Systems. All rights reserved.</p>
+    </div>
+  </div>
+
+  <!-- 5. Modal: How to Use -->
+  <div id="modalHowToUse" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>How to Use</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body">
+      <ol class="instructions-list">
+        <li><strong>Initialize Vault:</strong> Enter your secret Master Passphrase into the top lock bar and tap "Unlock".</li>
+        <li><strong>Store Confidential Notes:</strong> Add a Title and Content, then tap "Encrypt &amp; Store Note". Data is encrypted in memory via AES-256 prior to persistence.</li>
+        <li><strong>Two-Way API Usage:</strong> Open the right menu (⋮) to explore the API Console. Other apps can transmit data to this app for headless client encryption without server infrastructure.</li>
+        <li><strong>Data Portability:</strong> Export or import raw encrypted JSON backups at any time.</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 6. Modal: Partner With Us -->
+  <div id="modalPartner" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>Partner With Us</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body">
+      <p>We actively collaborate with privacy researchers, theological institutions, and educational networks.</p>
+      <form id="partnerForm" class="form-container">
+        <input type="text" id="partnerOrg" placeholder="Organization / Institution Name" class="std-input" required>
+        <input type="email" id="partnerEmail" placeholder="Official Email Address" class="std-input" required>
+        <button type="submit" class="primary-btn">Submit Proposal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Modal: Contact Us (4 Brand Buttons) -->
+  <div id="modalContact" class="fullscreen-modal" role="dialog" aria-modal="true">
+    <header class="modal-header">
+      <h2>Contact Us</h2>
+      <button class="close-modal-btn">Close</button>
+    </header>
+    <div class="modal-body">
+      <p>Direct communication channels for institutional and technical inquiries:</p>
+      
+      <div class="brand-buttons-stack">
+        <a href="mailto:contact@dvnoteplus.app" class="brand-btn gmail" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" class="btn-icon"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Gmail Official
+        </a>
+        <a href="tel:+18005550199" class="brand-btn phone">
+          <svg viewBox="0 0 24 24" class="btn-icon"><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          Direct Line Phone
+        </a>
+        <a href="https://wa.me/18005550199" class="brand-btn whatsapp" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" class="btn-icon"><path fill="currentColor" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c4.54 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.84-1.56 1.56-3.64 2.4-5.83 2.4-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24"/></svg>
+          WhatsApp Business
+        </a>
+        <a href="https://facebook.com" class="brand-btn facebook" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" class="btn-icon"><path fill="currentColor" d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
+          Facebook Corporate
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
