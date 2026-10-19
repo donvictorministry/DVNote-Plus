@@ -1,18 +1,19 @@
-<!DOCTYPE html>
+
+     <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DV-NOTE plus Asset Generator</title>
   <style>
-    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; background: #090d16; color: #fff; text-align: center; }
+    body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; background: #090d16; color: #fff; text-align: center; padding: 16px; }
     button { padding: 18px 32px; font-size: 20px; font-weight: bold; background: #0284c7; color: #fff; border: none; border-radius: 12px; cursor: pointer; }
     button:active { background: #0369a1; }
   </style>
 </head>
 <body>
   <h2>DV-NOTE plus: Icon &amp; WhatsApp OG Generator</h2>
-  <button id="downloadBtn">Download All Icons + WhatsApp OG Image</button>
+  <button id="downloadBtn">Download All Icons + WhatsApp OG Image (6 files)</button>
 
   <script>
     function createIcon(size) {
@@ -123,8 +124,11 @@
       triggerDownload(createIcon(16), 'icon16.png');
       setTimeout(() => triggerDownload(createIcon(48), 'icon48.png'), 200);
       setTimeout(() => triggerDownload(createIcon(128), 'icon128.png'), 400);
-      setTimeout(() => triggerDownload(createWhatsAppOG(), 'og-image.png'), 600);
+      setTimeout(() => triggerDownload(createIcon(192), 'icon192.png'), 600);
+      setTimeout(() => triggerDownload(createIcon(512), 'icon512.png'), 800);
+      setTimeout(() => triggerDownload(createWhatsAppOG(), 'og-image.png'), 1000);
     });
   </script>
 </body>
-</html>
+</html>  
+      
