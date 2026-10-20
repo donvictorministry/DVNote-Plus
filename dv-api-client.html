@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0284c7" />
+  <title>DV Crypto Client</title>
+  <style>
+    :root {
+      --font-size: 19px;
+      --bg: #f8fafc; --surface: #ffffff; --alt: #f1f5f9;
+      --text: #0f172a; --muted: #334155; --border: #cbd5e1;
+      --primary: #0284c7; --primary-hover: #0369a1;
+      --danger: #dc2626; --success: #16a34a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #090d16; --surface: #111827; --alt: #1f2937;
+        --text: #f9fafb; --muted: #9ca3af; --border: #374151;
+        --primary: #38bdf8; --primary-hover: #0ea5e9;
+        --danger: #ef4444; --success: #22c55e;
+      }
+    }
+    * {
+      box-sizing: border-box; margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: var(--font-size);
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      width: 100dvw; height: 100dvh; background: var(--bg); color: var(--text);
+      overflow-x: hidden; position: fixed; inset: 0;
+    }
+    .app-header {
+      position: fixed; top: 0; left: 0; width: 100dvw; height: 64px;
+      background: var(--surface); border-bottom: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center; z-index: 900;
+    }
+    .app-header h1 { font-size: calc(var(--font-size) + 2px); font-weight: 900; }
+    .viewport {
+      position: absolute; top: 64px; bottom: 0; left: 0; right: 0;
+      overflow-y: auto; overflow-x: hidden; padding: 16px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+      padding: 16px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .card h2 { color: var(--primary); font-size: calc(var(--font-size) + 1px); }
+    .hint { color: var(--muted); line-height: 1.5; }
+    label { font-weight: 800; color: var(--muted); }
+    input, textarea {
+      width: 100%; background: var(--alt); border: 2px solid var(--border);
+      border-radius: 12px; padding: 14px; color: var(--text); outline: none; line-height: 1.4;
+    }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    .row { display: flex; gap: 8px; }
+    .btn {
+      flex: 1; border: none; border-radius: 12px; padding: 14px 8px; font-weight: 800;
+      background: var(--primary); color: #fff; cursor: pointer;
+    }
+    .btn:active { background: var(--primary-hover); }
+    .btn.alt { background: var(--alt); color: var(--text); border: 2px solid var(--border); }
+    .toast-container {
+      position: fixed; top: 16px; left: 14px; right: 14px; z-index: 3000;
+      display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+    }
+    .toast {
+      pointer-events: auto; background: var(--surface); color: var(--text);
+      border: 2px solid var(--border); border-left: 6px solid var(--primary);
+      padding: 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+    .toast.danger { border-left-color: var(--danger); }
+    .toast.success { border-left-color: var(--success); }
+    .spinner-overlay {
+      display: none; position: fixed; inset: 0; width: 100dvw; height: 100dvh;
+      background: rgba(0,0,0,0.55); z-index: 4000; align-items: center; justify-content: center;
+    }
+    .spinner-overlay.active { display: flex; }
+    .spinner {
+      width: 64px; height: 64px; border: 6px solid rgba(255,255,255,0.35);
+      border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <aside id="toasts" class="toast-container" aria-live="polite"></aside>
+  <div id="spinner" class="spinner-overlay" role="status" aria-label="Processing"><div class="spinner"></div></div>
+
+  <header class="app-header"><h1>DV Crypto Client</h1></header>
+
+  <main class="viewport">
+    <section class="card">
+      <h2>1. DV-NOTE plus address</h2>
+      <p class="hint">Paste the full https address where DV-NOTE plus is hosted.</p>
+      <input type="text" id="appUrl" inputmode="url" autocomplete="off" placeholder="https://yourusername.github.io/dv-note-plus/" />
+    </section>
+
+    <section class="card">
+      <h2>2. Your data</h2>
+      <label for="keyIn">Passphrase</label>
+      <input type="text" id="keyIn" autocomplete="off" value="Proverb2026" />
+      <label for="textIn">Text to encrypt</label>
+      <textarea id="textIn" rows="3">Confidential Research Transcript</textarea>
+      <label for="payloadIn">Encrypted JSON to decrypt</label>
+      <textarea id="payloadIn" rows="4" placeholder="Filled automatically after Encrypt"></textarea>
+    </section>
+
+    <section class="card">
+      <h2>3. Mode 1: postMessage</h2>
+      <p class="hint">Talks to DV-NOTE plus in the background. No page change.</p>
+      <div class="row">
+        <button class="btn alt" id="pingBtn">Ping</button>
+        <button class="btn" id="encBtn">Encrypt</button>
+        <button class="btn" id="decBtn">Decrypt</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4. Mode 2: URL parameters</h2>
+      <p class="hint">Opens DV-NOTE plus, which sends the result back here. This page must be hosted on https.</p>
+      <div class="row">
+        <button class="btn" id="encUrlBtn">Encrypt via URL</button>
+        <button class="btn" id="decUrlBtn">Decrypt via URL</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>5. Response</h2>
+      <textarea id="outBox" rows="8" readonly placeholder="Responses appear here..."></textarea>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const urlIn = $('appUrl'), keyIn = $('keyIn'), textIn = $('textIn'), payloadIn = $('payloadIn'), outBox = $('outBox');
+
+    let frame = null, appOrigin = '', frameKey = '', reqId = 0;
+    const pending = {};
+    let spinCount = 0;
+
+    function toast(msg, type) {
+      const t = document.createElement('div');
+      t.className = 'toast ' + (type || '');
+      t.textContent = msg;
+      $('toasts').appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    function spin(on) {
+      spinCount = Math.max(0, spinCount + (on ? 1 : -1));
+      $('spinner').classList.toggle('active', spinCount > 0);
+    }
+
+    function parseUrl() {
+      try {
+        const u = new URL(urlIn.value.trim());
+        return /^https?:$/.test(u.protocol) ? u : null;
+      } catch (_) { return null; }
+    }
+
+    try { urlIn.value = localStorage.getItem('dvClientUrl') || ''; } catch (_) {}
+
+    function ensureFrame(u) {
+      const src = u.origin + u.pathname;
+      if (frame && frameKey === src) return Promise.resolve();
+      if (frame) frame.remove();
+      appOrigin = u.origin;
+      frameKey = src;
+      return new Promise((resolve, reject) => {
+        frame = document.createElement('iframe');
+        frame.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
+        const timer = setTimeout(() => reject(new Error('DV-NOTE plus did not load. Check the address.')), 10000);
+        frame.onload = () => { clearTimeout(timer); resolve(); };
+        frame.src = src;
+        document.body.appendChild(frame);
+      });
+    }
+
+    window.addEventListener('message', (e) => {
+      if (e.origin !== appOrigin) return;
+      const d = e.data;
+      if (!d || d.requestId === undefined) return;
+      const p = pending[d.requestId];
+      if (!p) return;
+      clearTimeout(p.timer);
+      delete pending[d.requestId];
+      p.resolve(d);
+    });
+
+    function show(res) {
+      outBox.value = JSON.stringify(res, null, 2);
+      toast(res.success ? 'Request completed.' : 'Request failed: ' + (res.error || 'unknown'), res.success ? 'success' : 'danger');
+    }
+
+    async function callApi(action) {
+      const u = parseUrl();
+      if (!u) { toast('Enter the full https:// address of DV-NOTE plus.', 'danger'); return; }
+      try { localStorage.setItem('dvClientUrl', u.href); } catch (_) {}
+
+      let payload;
+      if (action === 'encrypt') payload = textIn.value;
+      if (action === 'decrypt') {
+        try { payload = JSON.parse(payloadIn.value); }
+        catch (_) { toast('The encrypted JSON box does not contain valid JSON.', 'danger'); return; }
+      }
+
+      spin(true);
+      try {
+        await ensureFrame(u);
+        const id = ++reqId;
+        const res = await new Promise((resolve, reject) => {
+          const timer = setTimeout(() => { delete pending[id]; reject(new Error('No reply from DV-NOTE plus.')); }, 10000);
+          pending[id] = { resolve, timer };
+          frame.contentWindow.postMessage({ action, payload, key: keyIn.value, requestId: id }, appOrigin);
+        });
+        if (action === 'encrypt' && res.success) payloadIn.value = JSON.stringify(res.response);
+        show(res);
+      } catch (err) {
+        toast(err.message, 'danger');
+      } finally {
+        spin(false);
+      }
+    }
+
+    function viaUrl(action) {
+      const u = parseUrl();
+      if (!u) { toast('Enter the full https:// address of DV-NOTE plus.', 'danger'); return; }
+      if (location.protocol !== 'https:') { toast('Mode 2 needs this page hosted on https so the result can return.', 'danger'); return; }
+      try { localStorage.setItem('dvClientUrl', u.href); } catch (_) {}
+      const p = new URLSearchParams();
+      p.set('api', action);
+      p.set('key', keyIn.value);
+      if (action === 'encrypt') p.set('text', textIn.value);
+      if (action === 'decrypt') p.set('payload', payloadIn.value.trim());
+      p.set('callback', location.origin + location.pathname);
+      location.href = u.origin + u.pathname + '#' + p.toString();
+    }
+
+    $('pingBtn').addEventListener('click', () => callApi('ping'));
+    $('encBtn').addEventListener('click', () => callApi('encrypt'));
+    $('decBtn').addEventListener('click', () => callApi('decrypt'));
+    $('encUrlBtn').addEventListener('click', () => viaUrl('encrypt'));
+    $('decUrlBtn').addEventListener('click', () => viaUrl('decrypt'));
+
+    // Result returning from Mode 2
+    (function () {
+      const h = location.hash.replace(/^#/, '');
+      if (h.indexOf('result=') === -1) return;
+      try {
+        const r = JSON.parse(new URLSearchParams(h).get('result'));
+        if (r && r.success && r.action === 'encrypt') payloadIn.value = JSON.stringify(r.response);
+        show(r);
+      } catch (_) { toast('Could not read the returned result.', 'danger'); }
+      history.replaceState(null, '', location.pathname);
+    })();
+  </script>
+</body>
+</html>
