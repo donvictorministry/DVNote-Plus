@@ -179,6 +179,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 }
 
 .vault-status-header {
@@ -196,11 +197,14 @@ html, body {
 .vault-key-input-row {
   display: flex;
   gap: 8px;
+  align-items: center;
+  width: 100%;
 }
 
 .vault-key-input-row input {
   flex: 1 1 auto;
   min-width: 0;
+  width: auto !important;
   background: var(--surface-alt);
   border: 2px solid var(--border);
   border-radius: 10px;
@@ -209,9 +213,9 @@ html, body {
   outline: none;
 }
 
-.submit-key-btn {
-  width: auto;
-  padding: 10px 20px;
+.vault-key-input-row .submit-key-btn {
+  width: auto !important;
+  padding: 10px 18px;
   flex: 0 0 auto;
 }
 
