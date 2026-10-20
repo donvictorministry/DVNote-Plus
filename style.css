@@ -404,14 +404,13 @@ input[type="text"]:focus, input[type="password"]:focus, textarea:focus {
 }
 
 /* ==============================================================
-   SIDEBAR DRAWERS (Left & Right)
+   SIDEBAR DRAWERS (Left & Right) - FULL SCREEN, EDGE TO EDGE
    ============================================================== */
 .sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 88dvw;
-  max-width: 360px;
+  width: 100dvw;
   height: 100dvh;
   background: var(--surface);
   z-index: 1200;
