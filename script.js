@@ -278,10 +278,18 @@ const leftSidebar = document.getElementById('leftSidebar');
 const rightSidebar = document.getElementById('rightSidebar');
 const drawerOverlay = document.getElementById('drawerOverlay');
 
-function closeDrawers() {
+function forceCloseDrawers() {
   leftSidebar.classList.remove('open');
   rightSidebar.classList.remove('open');
   drawerOverlay.classList.remove('active');
+}
+
+// Never tears the sidebar down while a modal is open on top of it
+function closeDrawers() {
+  Promise.resolve().then(() => {
+    if (document.querySelector('.fullscreen-modal.active')) return;
+    forceCloseDrawers();
+  });
 }
 
 leftMenuBtn.addEventListener('click', () => {
@@ -297,10 +305,9 @@ rightMenuBtn.addEventListener('click', () => {
 drawerOverlay.addEventListener('click', closeDrawers);
 document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', closeDrawers));
 
-// 7 Modals
+// 7 Modals (open on top of the sidebar; closing returns to the sidebar)
 document.querySelectorAll('.nav-link-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    closeDrawers();
     const modal = document.getElementById(btn.getAttribute('data-modal'));
     if (modal) modal.classList.add('active');
   });
@@ -308,7 +315,8 @@ document.querySelectorAll('.nav-link-btn').forEach(btn => {
 
 document.querySelectorAll('.close-modal-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.fullscreen-modal').forEach(m => m.classList.remove('active'));
+    const modal = btn.closest('.fullscreen-modal');
+    if (modal) modal.classList.remove('active');
   });
 });
 
@@ -637,7 +645,6 @@ frame.onload = () => {
 }
 
 openApiTesterBtn.addEventListener('click', () => {
-  closeDrawers();
   apiModal.classList.add('active');
 });
 closeApiModalBtn.addEventListener('click', () => apiModal.classList.remove('active'));
@@ -706,7 +713,6 @@ importVaultInput.addEventListener('change', (e) => {
       confirmMessage.textContent = current
         ? `This will replace the ${current} encrypted record${current === 1 ? '' : 's'} on this device with ${parsed.length} record${parsed.length === 1 ? '' : 's'} from the backup. Export your current vault first if you still need it.`
         : `${parsed.length} encrypted record${parsed.length === 1 ? '' : 's'} will be imported into this device.`;
-      closeDrawers();
       modalConfirm.classList.add('active');
     } catch (_) {
       showToast('Invalid vault backup file.', 'danger');
@@ -811,6 +817,81 @@ bluetoothShareBtn.addEventListener('click', async () => {
     if (err && err.name !== 'AbortError') showToast('Sharing failed.', 'danger');
   }
 });
+
+// 12. Android-Style Back Navigation (modal -> sidebar -> home)
+let histCount = 0;
+let ignorePop = false;
+
+const backArrowSvg = '<svg class="ui-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z"/></svg>';
+
+function closeModalEl(m) {
+  m.classList.remove('active');
+  if (m.id === 'modalConfirm') pendingImport = null;
+  if (m.id === 'modalBible') {
+    try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
+  }
+}
+
+function layerCount() {
+  const drawer = (leftSidebar.classList.contains('open') || rightSidebar.classList.contains('open')) ? 1 : 0;
+  return drawer + document.querySelectorAll('.fullscreen-modal.active').length;
+}
+
+function syncHistory() {
+  const depth = layerCount();
+  if (depth > histCount) {
+    for (let i = histCount; i < depth; i++) history.pushState({ dvLayer: i + 1 }, '');
+    histCount = depth;
+  } else if (depth < histCount) {
+    const diff = histCount - depth;
+    histCount = depth;
+    ignorePop = true;
+    history.go(-diff);
+  }
+}
+
+function closeTopLayer() {
+  const modals = Array.from(document.querySelectorAll('.fullscreen-modal.active'));
+  if (modals.length) {
+    modals.sort((a, b) => (parseInt(getComputedStyle(b).zIndex, 10) || 0) - (parseInt(getComputedStyle(a).zIndex, 10) || 0));
+    closeModalEl(modals[0]);
+    return;
+  }
+  forceCloseDrawers();
+}
+
+window.addEventListener('popstate', () => {
+  if (ignorePop) { ignorePop = false; return; }
+  histCount = Math.max(0, histCount - 1);
+  closeTopLayer();
+});
+
+const layerObserver = new MutationObserver(syncHistory);
+function watchLayer(el) {
+  layerObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
+}
+
+function prepareModal(m) {
+  watchLayer(m);
+  const header = m.querySelector('.modal-header');
+  if (!header || header.querySelector('.modal-back-btn')) return;
+  const b = document.createElement('button');
+  b.className = 'header-btn modal-back-btn';
+  b.setAttribute('aria-label', 'Back');
+  b.innerHTML = backArrowSvg;
+  b.addEventListener('click', () => closeModalEl(m));
+  header.insertBefore(b, header.firstChild);
+}
+
+[leftSidebar, rightSidebar].forEach(watchLayer);
+document.querySelectorAll('.fullscreen-modal').forEach(prepareModal);
+
+// Also covers modals added later by other modules (e.g. bible.js)
+new MutationObserver((muts) => {
+  muts.forEach((mu) => mu.addedNodes.forEach((n) => {
+    if (n.nodeType === 1 && n.classList.contains('fullscreen-modal')) prepareModal(n);
+  }));
+}).observe(document.body, { childList: true });
 
 // Initial Setup
 renderNotes();
